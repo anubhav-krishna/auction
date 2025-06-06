@@ -6,7 +6,7 @@ import { User } from "../models/userSchema.js";
 export const verifyJWT = asynchandler(async (req, _, next) => {
     try {
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
-        console.log("Token received:", token);
+        // console.log("Token received:", token);
 
         if (!token) {
             throw new ApiError("Unauthorized access", 401);
@@ -31,3 +31,11 @@ export const verifyJWT = asynchandler(async (req, _, next) => {
     }
 });
 
+export const isAuthorized = (...roles) => {
+    return (req, _, next) => {
+        if (!roles.includes(req.user.role)) {
+            return next(new ApiError("You are not authorized to perform this action", 403));
+        }
+        next();
+    };
+}

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const auctionSchema= new mongoose.Schema({
        title: String,
        description: String,
-       catergory: String,
+       category: String,
          condition: {
         type: String,
         enum: ["New", "Used"],
@@ -31,7 +31,7 @@ const auctionSchema= new mongoose.Schema({
         ref:"User",
         required: true
        },
-       bid:[
+       bids:[
         {
             userId:{
              type: mongoose.Schema.Types.ObjectId,

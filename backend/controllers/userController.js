@@ -59,7 +59,7 @@ export const regeisterUser = asynchandler(async (req, res,next) => {
     }
     const cloudinaryResponse = await uploadOnCloudinary(profileImage.tempFilePath, "profile");
     if(!cloudinaryResponse) {
-        return next(new ApiError("Error uploading image", 500));
+        return next(new ApiError("Error uploading profile image", 500));
     }
     const user = await User.create({
         username,
