@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import {Auction} from "../models/auctionSchema.js";
 import {User} from "../models/userSchema.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js";
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 export const addNewAuctionItem = asynchandler(async (req, res, next) => {
     if (!req.files || Object.keys(req.files).length === 0) {

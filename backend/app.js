@@ -6,6 +6,7 @@ import fileUpload from 'express-fileupload';
 import connectDB from './database/index.js';
 import userRoutes from './routes/userRoutes.js';
 import auctionRoutes from './routes/auctionRoutes.js';
+import bidRoutes from './routes/bidRoutes.js';
 const app= express();
 config({
     path: "./config/config.env"
@@ -26,6 +27,7 @@ app.use(fileUpload({
 }));
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/auction", auctionRoutes);
+app.use("/api/v1/bid", bidRoutes);
 connectDB();
 
 export default app;
