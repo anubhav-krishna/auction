@@ -2,9 +2,9 @@ import { addNewAuctionItem, getAllAuctionItems, getAuctionDetails,republishItem,
 import express from "express";
 import { verifyJWT ,isAuthorized} from "../middlewares/auth.middleware.js";
 import { get } from "mongoose";
-
+import { trackCommissionStatus } from "../middlewares/trackCommissionStatus.js";
 const router = express.Router();
-router.post("/add", verifyJWT,isAuthorized("Auctioneer"),addNewAuctionItem);
+router.post("/add", verifyJWT,isAuthorized("Auctioneer"),trackCommissionStatus,addNewAuctionItem);
 router.get("/allitems",getAllAuctionItems)
 router.get("/myitems", verifyJWT, getMyAuctionItems);
 router.get("/details/:id", verifyJWT, getAuctionDetails);

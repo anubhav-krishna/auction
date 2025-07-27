@@ -16,11 +16,10 @@ export const addNewAuctionItem = asynchandler(async (req, res, next) => {
     if (!allowedFormats.includes(image.mimetype)) {
         return next(new ApiError("Invalid image format", 400));
     }
-    console.log(req.body);
     const {
         title,
         description,
-        category, // fixed typo
+        category, // fixed type
         condition,
         startingBid,
         startTime,
@@ -122,16 +121,20 @@ export const republishItem = asynchandler(async (req, res, next) => {
         return next(new ApiError("Auction item not found", 404));
     }
     
-    // if (auctionItem.createdBy.toString() !== req.user._id.toString()) {
-    //     return next(new ApiError("You are not authorized to republish this auction item", 403));
-    // }
+    if (auctionItem.createdBy.toString() !== req.user._id.toString()) {
+        return next(new ApiError("You are not authorized to republish this auction item", 403));
+    }
+    const {startTime, endTime} = req.body;
+    if (!startTime || !endTime) {
+        return next(new ApiError("Start time and end time are required to republish", 400));
+    }
     
     if (new Date(auctionItem.endTime) > new Date()) {
         return next(new ApiError("Auction item is still active and cannot be republished", 400));
     }
     
-    auctionItem.startTime = new Date();
-    auctionItem.endTime = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // Extend by one week
+    auctionItem.startTime = startTime; // Update start time
+    auctionItem.endTime = endTime; // Update end time
     auctionItem.bids = []; // Reset bids
     auctionItem.commissionCalculated= false; // Reset commission status
     const owner = await User.findById(auctionItem.createdBy);
@@ -139,5 +142,5 @@ export const republishItem = asynchandler(async (req, res, next) => {
     await owner.save({validateBeforeSave: false});
     await auctionItem.save();
     
-    return res.status(200).json(new ApiResponse("Auction item republished successfully", auctionItem));
+    return res.status(200).json(new ApiResponse(`Auction item republished successfully and will be listed on ${startTime}`, auctionItem));
 });
