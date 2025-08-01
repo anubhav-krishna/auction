@@ -3,7 +3,6 @@ import {asynchandler} from "../utils/asynchandler.js";
 import {ApiError} from "../utils/ApiError.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { register } from "module";
  
 export const generateAccessandRefreshToken=  async(userId)=>{
     try{
