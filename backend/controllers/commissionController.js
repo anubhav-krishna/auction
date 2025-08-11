@@ -1,9 +1,21 @@
 import { User } from "../models/userSchema.js";
 import { PaymentProof } from "../models/commissionProofSchema.js";
+import { Auction } from "../models/auctionSchema.js";
 import {asynchandler} from "../utils/asynchandler.js"; 
 import {ApiError} from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { mongo } from "mongoose";
+
+export const calculateCommission = async(auctionId) => {
+    if(!mongo.Types.ObjectId.isValid(auctionId)) {
+        throw new ApiError("Invalid auction ID", 400);
+    }
+    const auction = await Auction.findById(auctionId);
+    const commissionRate = 0.05;
+    const commission = auction.currentBid * commissionRate;
+    return commission
+}
 
 export const proofOfCommission = asynchandler(async (req, res, next) => {
     if (!req.files || Object.keys(req.files).length === 0) {
@@ -44,6 +56,6 @@ export const proofOfCommission = asynchandler(async (req, res, next) => {
         comment,
     });
     await paymentProof.save();
-    res.status(201).json(new ApiResponse("Your proof has been submitted successfully. We will review it and respond within 24 hours", true, paymentProof));
+    res.status(201).json(new ApiResponse(paymentProof,201,"Your proof has been submitted successfully. We will review it and respond within 24 hours"));
     
 })

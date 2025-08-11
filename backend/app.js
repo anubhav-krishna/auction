@@ -8,6 +8,8 @@ import userRoutes from './routes/userRoutes.js';
 import auctionRoutes from './routes/auctionRoutes.js';
 import bidRoutes from './routes/bidRoutes.js';
 import commissionRoutes from './routes/commissionRouter.js';
+import superAdminRoutes from './routes/superAdminRoutes.js';
+import { endedAuctionCron } from './automation/endedAuctionCron.js';
 const app= express();
 config({
     path: "./config/config.env"
@@ -30,6 +32,8 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/auction", auctionRoutes);
 app.use("/api/v1/bid", bidRoutes);
 app.use("/api/v1/commission", commissionRoutes);
+app.use("/api/v1/superadmin", superAdminRoutes);
+endedAuctionCron();
 connectDB();
 
 export default app;

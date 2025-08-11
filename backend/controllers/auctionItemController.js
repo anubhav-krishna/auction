@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import {Auction} from "../models/auctionSchema.js";
 import {User} from "../models/userSchema.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js";
+import { Bid } from "../models/bidSchema.js";
 import mongoose from "mongoose";
 
 export const addNewAuctionItem = asynchandler(async (req, res, next) => {
@@ -102,9 +103,6 @@ export const removeFromAuction = asynchandler(async (req, res, next) => {
     if (!auctionItem) {
         return next(new ApiError("Auction item not found", 404));
     }
-     if (auctionItem.createdBy.toString() !== req.user._id.toString()) {
-        return next(new ApiError("You are not authorized to remove this auction item", 403));
-    }
     await auctionItem.deleteOne();
     return res.status(200).json(new ApiResponse("Auction item removed successfully", null));
 });
@@ -132,15 +130,26 @@ export const republishItem = asynchandler(async (req, res, next) => {
     if (new Date(auctionItem.endTime) > new Date()) {
         return next(new ApiError("Auction item is still active and cannot be republished", 400));
     }
+    if(auctionItem.highestBidder) {
+        const highestBidder = await User.findById(auctionItem.highestBidder);
+        if (highestBidder) {
+            highestBidder.auctionsWon -= 1; // Decrease the count of auctions won
+            highestBidder.moneySpent -= auctionItem.currentBid; // Decrease the money spent
+            await highestBidder.save({ validateBeforeSave: false });
+        }
+    }
     
     auctionItem.startTime = startTime; // Update start time
     auctionItem.endTime = endTime; // Update end time
     auctionItem.bids = []; // Reset bids
     auctionItem.commissionCalculated= false; // Reset commission status
+    auctionItem.currentBid = 0; // Reset current bid
+    auctionItem.highestBidder = null; // Reset highest bidder
     const owner = await User.findById(auctionItem.createdBy);
      owner.unpaidCommission= 0; // Reset owner's unpaid commission
     await owner.save({validateBeforeSave: false});
     await auctionItem.save();
+    await Bid.deleteMany({ auctionItem: auctionItem._id });
     
-    return res.status(200).json(new ApiResponse(`Auction item republished successfully and will be listed on ${startTime}`, auctionItem));
+    return res.status(200).json(new ApiResponse(auctionItem,`Auction item republished successfully and will be listed on ${startTime}`));
 });
