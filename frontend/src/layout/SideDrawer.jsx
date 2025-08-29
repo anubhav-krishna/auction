@@ -14,13 +14,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/userSlice";
 import { Link } from "react-router-dom";
 
-
 const SideDrawer = () => {
   const [show, setShow] = useState(false);
 
   const { isAuthenticated, user } = useSelector((state) => state.user);
   // console.log(user);
-  
+
   const dispatch = useDispatch();
   const handleLogout = () => {
     dispatch(logout());
@@ -190,7 +189,7 @@ const SideDrawer = () => {
               to={"/"}
               className="font-semibold hover:text-[#d6482b] hover:transition-all hover:duration-150"
             >
-              Jay Prakash & Vishal Devasi
+              Anubhav Krishna & Vishal Devasi
             </Link>
           </p>
         </div>
